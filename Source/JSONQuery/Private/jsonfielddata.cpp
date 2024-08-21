@@ -498,7 +498,11 @@ void UJsonFieldData::WriteObject(TSharedRef<TJsonWriter<TCHAR>> writer, FString 
 void UJsonFieldData::OnReady(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
 	RemoveFromRoot();
 	if (!bWasSuccessful) {
-		UE_LOG(JSONQueryLog, Error, TEXT("Response was invalid! Please check the URL. Error: %i"), Response->GetResponseCode());
+		FString ErrMsg = "Response was invalid! Please check the URL.";
+		if(Response.IsValid()) {
+			ErrMsg += " Error: " + FString::FromInt(Response->GetResponseCode());
+		}
+		UE_LOG(JSONQueryLog, Error, TEXT("%s"), *ErrMsg);
 		
 		// Broadcast the failed event
 		OnGetResult.Broadcast(false, this, EJSONResult::HttpFailed);
